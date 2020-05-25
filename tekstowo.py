@@ -6,6 +6,7 @@ import collections
 import requests
 import sys
 import re
+import pydoc
 
 
 SEARCH_BASE_URL = "http://www.tekstowo.pl/wyszukaj.html"
@@ -133,7 +134,13 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--lyrics", help="Download lyrics", action="store_true")
     parser.add_argument("-f", "--file", type=str, help="Save lyrics to file")
     parser.add_argument(
-        "-q", "--quiete", help="Do not print lyrics to stdout", action="store_true"
+        "-q", "--quiete", help="Do not open pager, without output", action="store_true"
+    )
+    parser.add_argument(
+        "-p",
+        "--print",
+        help="Print output to stdout instead of open pager",
+        action="store_true",
     )
     args = parser.parse_args()
     lyrics, translation = "", ""
@@ -154,5 +161,8 @@ if __name__ == "__main__":
     if args.file:
         with open(args.file, "w") as f:
             f.write(f"{lyrics}\n{translation}")
-    if not args.quiete:
+    if args.print:
         print(f"{lyrics}\n{translation}")
+        sys.exit(0)
+    if not args.quiete:
+        pydoc.pager(f"{lyrics}\n{translation}")
