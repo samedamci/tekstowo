@@ -131,9 +131,12 @@ if __name__ == "__main__":
         "-t", "--translation", help="Download translation", action="store_true"
     )
     parser.add_argument("-l", "--lyrics", help="Download lyrics", action="store_true")
+    parser.add_argument("-f", "--file", type=str, help="Save lyrics to file")
+    parser.add_argument(
+        "-q", "--quiete", help="Do not print lyrics to stdout", action="store_true"
+    )
     args = parser.parse_args()
-    lyrics = ""
-    translation = ""
+    lyrics, translation = "", ""
     if not args.translation or args.lyrics:
         try:
             lyrics = download_lyrics(Song(*retrieve_artist_and_title(args.song), None))
@@ -148,4 +151,8 @@ if __name__ == "__main__":
         except (InvalidSongFormat, TranslationNotFound, LyricsNotFound) as e:
             print(e)
             sys.exit(1)
-    print(f"{lyrics}\n{translation}")
+    if args.file:
+        with open(args.file, "w") as f:
+            f.write(f"{lyrics}\n{translation}")
+    if not args.quiete:
+        print(f"{lyrics}\n{translation}")
