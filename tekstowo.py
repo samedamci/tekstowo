@@ -6,10 +6,10 @@ import sys
 import re
 
 
-SEARCH_BASE_URL = 'http://www.tekstowo.pl/wyszukaj.html'
-SEARCH_FMT_STR = SEARCH_BASE_URL + '?search-title={title}&search-artist={artist}'
+SEARCH_BASE_URL = "http://www.tekstowo.pl/wyszukaj.html"
+SEARCH_FMT_STR = SEARCH_BASE_URL + "?search-title={title}&search-artist={artist}"
 
-Song = collections.namedtuple('Song', ['artist', 'title', 'url'])
+Song = collections.namedtuple("Song", ["artist", "title", "url"])
 
 translations_localizator = r"<div id=\"translation\" class=\"id-\d+\">"
 
@@ -20,6 +20,7 @@ class InvalidSongFormat(Exception):
 
 class LyricsNotFound(Exception):
     pass
+
 
 class TranslationNotFound(Exception):
     pass
@@ -42,45 +43,53 @@ def fetch_lyrics(song):
 
 def extract_song(item):
     artist_title = item.split('title="')[1].split('">')[0]
-    artist, title = map(str.strip, artist_title.split(' - ')[:2])
-    url = 'http://www.tekstowo.pl{}.html' \
-        .format(item.split('a href="')[1].split('.html')[0])
+    artist, title = map(str.strip, artist_title.split(" - ")[:2])
+    url = "http://www.tekstowo.pl{}.html".format(
+        item.split('a href="')[1].split(".html")[0]
+    )
     return Song(artist, title, url)
 
 
 def parse_search_results(results):
-    results = results.decode('utf-8')
-    if 'Znalezieni artyści' not in results:
+    results = results.decode("utf-8")
+    if "Znalezieni artyści" not in results:
         raise LyricsNotFound("Cannot find given artist")
-    results = results.split('Znalezieni artyści:')[0]
-    return [extract_song(item) for item in results.split('<div class="box-przeboje">')[1:]]
+    results = results.split("Znalezieni artyści:")[0]
+    return [
+        extract_song(item) for item in results.split('<div class="box-przeboje">')[1:]
+    ]
 
 
 def parse_song_lyrics(html):
-    return html.decode('utf-8') \
-        .split('<h2>Tekst piosenki:</h2><br />')[1] \
-        .split('<p>&nbsp;</p>')[0] \
-        .replace('<br />', '\n') \
-        .replace('\n\n', '\n') \
+    return (
+        html.decode("utf-8")
+        .split("<h2>Tekst piosenki:</h2><br />")[1]
+        .split("<p>&nbsp;</p>")[0]
+        .replace("<br />", "\n")
+        .replace("\n\n", "\n")
         .strip()
+    )
+
 
 def parse_song_translation(html):
-    code_as_string = html.decode('utf-8')
+    code_as_string = html.decode("utf-8")
     begin_line = re.search(translations_localizator, code_as_string)
-    if begin_line == None:
+    if begin_line is None:
         raise TranslationNotFound("Cannot find translation for given song")
-    return code_as_string \
-        .split(begin_line[0])[1] \
-        .split('<p>&nbsp;</p>')[0] \
-        .replace('<br />', '\n') \
-        .replace('\n\n', '\n') \
+    return (
+        code_as_string.split(begin_line[0])[1]
+        .split("<p>&nbsp;</p>")[0]
+        .replace("<br />", "\n")
+        .replace("\n\n", "\n")
         .strip()
+    )
+
 
 def retrieve_artist_and_title(song):
-    if song.count('-') != 1:
+    if song.count("-") != 1:
         raise InvalidSongFormat('Passed song string must contain only one "-"')
 
-    artist, title = map(str.strip, song.split('-'))
+    artist, title = map(str.strip, song.split("-"))
     if len(artist) == 0:
         raise InvalidSongFormat("Artist part cannot be empty")
     if len(title) == 0:
@@ -97,6 +106,7 @@ def download_lyrics(song):
     except IndexError:
         raise LyricsNotFound("No lyrics found")
 
+
 def download_translation(song):
     search_results = search_song(song)
     try:
@@ -105,15 +115,23 @@ def download_translation(song):
     except IndexError:
         raise TranslationNotFound("No translation found")
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Find lyrics and translation for a song using tekstowo.pl')
-    parser.add_argument('song', type=str, help='Song to find lyrics for in format (with quotes): '
-                                     '"<ARTIST> - <TITLE>"')
-    parser.add_argument("-t", "--translation", help='Download translation', action="store_true")
-    parser.add_argument("-l", "--lyrics", help='Download lyrics', action="store_true")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Find lyrics and translation for a song using tekstowo.pl"
+    )
+    parser.add_argument(
+        "song",
+        type=str,
+        help="Song to find lyrics for in format (with quotes): " '"<ARTIST> - <TITLE>"',
+    )
+    parser.add_argument(
+        "-t", "--translation", help="Download translation", action="store_true"
+    )
+    parser.add_argument("-l", "--lyrics", help="Download lyrics", action="store_true")
     args = parser.parse_args()
-    lyrics = ''
-    translation = ''
+    lyrics = ""
+    translation = ""
     if not args.translation or args.lyrics:
         try:
             lyrics = download_lyrics(Song(*retrieve_artist_and_title(args.song), None))
@@ -122,9 +140,10 @@ if __name__ == '__main__':
             sys.exit(1)
     if args.translation:
         try:
-            translation = download_translation(Song(*retrieve_artist_and_title(args.song), None))
+            translation = download_translation(
+                Song(*retrieve_artist_and_title(args.song), None)
+            )
         except (InvalidSongFormat, TranslationNotFound, LyricsNotFound) as e:
             print(e)
             sys.exit(1)
     print(f"{lyrics}\n{translation}")
-
