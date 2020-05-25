@@ -1,0 +1,41 @@
+.TH TEKSTOWO 1 "May 2020" "" "User Commands"
+.SH NAME
+tekstowo \- find lyrics and translation for a song using tekstowo.pl
+.SH SYNOPSIS
+.B tekstowo
+.RI [ OPTIONS ]...
+.RI [ "SONG" ]
+.SH EXAMPLE
+tekstowo -f demons_lyrics "Imagine Dragons - Demons"
+.SH DESCRIPTION
+Find lyrics and translation for a song using tekstowo.pl and open in default system pager.
+.SH OPTIONS
+.TP
+\fB\-t\fR, \fB\-\-translation
+download translation for lyrics
+.TP
+\fB\-l\fR, \fB\-\-lyrics
+download lyrics
+
+\fIdefault
+.TP
+\fB\-q\fR, \fB\-\-quiete
+do not open pager - silent
+.TP
+\fB\-p\fR, \fB\-\-print
+print output to stdout instead of open pager
+
+\fIoverwrites \fB-p \fIoption!
+
+.TP
+\fB\-f\fR, \fB\-\-file \fIFILE\/\fR
+save output to file
+.TP
+\fB\-h\fR, \fB\-\-help
+display help and exit
+.SH LICENSE
+License MIT
+
+2018 Łukasz Hryniuk
+
+2020 samedamci
