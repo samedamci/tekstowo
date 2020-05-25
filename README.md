@@ -3,7 +3,7 @@
 Retrieve lyrics or translation of a given song from
 [tekstowo.pl](http://www.tekstowo.pl/).
 
-### Example
+## Example
 
 ```shell
 $ tekstowo.py "Nirvana - About a girl"
@@ -12,7 +12,18 @@ I do, with an ear to lend
 ...
 ```
 
-### Credits
+# Installation
+
+### Arch Linux
+Install package from AUR for example with yay.
+```shell
+yay -S tekstowo-git
+```
+
+### From source
+Clone repo and you know what to do. 🙃
+
+## Credits
 
 Most of the code has been copied from
 [winamp-tekstowo](https://github.com/asdfMaciej/winamp-tekstowo)
